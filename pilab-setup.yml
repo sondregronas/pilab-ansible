@@ -1,0 +1,27 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Change user password
+      user:
+        name: pi
+        update_password: always
+        password: "{{ newpassword|password_hash('sha512') }}"
+    - name: Disable Autologin
+      ansible.builtin.shell: |
+        sed -i 's/^greeter-hide-users=true/greeter-hide-users=false/g' /etc/lightdm/lightdm.conf
+        sed -i 's/^\#greeter-allow-guest=true/greeter-allow-guest=false/g' /etc/lightdm/lightdm.conf
+        sed -i 's/^\#greeter-show-manual-login=false/greeter-show-manual-login=true/g' /etc/lightdm/lightdm.conf
+        sed -i 's/^\#allow-guest=true/allow-guest=false/g' /etc/lightdm/lightdm.conf
+        sed -i 's/^\#allow-guest=true/allow-guest=false/g' /etc/lightdm/lightdm.conf
+        sed -i 's/^\#autologin-user-timeout=0/autologin-user-timeout=10/g' /etc/lightdm/lightdm.conf
+        sed -i 's/^autologin-user=pi/\#autologin-user=pi/g' /etc/lightdm/lightdm.conf
+    - name: Update and reboot
+      ansible.builtin.shell: |
+        apt-get update
+        apt-get upgrade -y
+        apt-get install php-mysql -y
+        apt-get install php -y
+        apt-get install mariadb-server -y
+    - name: Reboot
+      reboot:
