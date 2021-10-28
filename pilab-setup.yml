@@ -7,6 +7,11 @@
         name: pi
         update_password: always
         password: "{{ newpassword|password_hash('sha512') }}"
+        
+    - name: Upgrade from buster to bullseye
+      ansible.builtin.shell: |
+        sed -i 's/buster/bullseye/g' /etc/apt/sources.list
+        sed -i 's/buster/bullseye/g' /etc/apt/sources.list.d/raspi.list
 
     - name: Disable Autologin
       ansible.builtin.shell: |
