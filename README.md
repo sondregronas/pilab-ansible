@@ -1,6 +1,6 @@
 # pilab-ansible
 
-Deployment of Raspberry Pi devices in a School Lab environment. - Mainly just figuring out Ansible.
+Deployment of Raspberry Pi devices in a School Lab environment.
 
 Tested on Raspberry Pi 4 (2GB) running a clean install of Raspberry Pi OS (32-bit)
 
@@ -8,6 +8,8 @@ Tested on Raspberry Pi 4 (2GB) running a clean install of Raspberry Pi OS (32-bi
 ### What it does
 - Currently updates Raspbian from buster to bullseye
 - Changes the admin password on user pi
+- Changes the hostname of the pis based off of variable in inventory.ini
+- Creates users on the pi based off the hostname
 - Disables autologin to user pi, login prompt is instead selected
 - Updates aptitude
 - Installs gcc-8-base, this is required for the transition from buster to bullseye
@@ -27,4 +29,4 @@ Tested on Raspberry Pi 4 (2GB) running a clean install of Raspberry Pi OS (32-bi
  - `ansible -m shell -a 'sudo cp .ssh/authorized_keys /root/.ssh/authorized_keys' -u pi all`
 
 ### The goal
-The goal is simply to save time when setting up / resetting pi's in a classroom environment. The main thing to figure out still is evenly distributing user accounts (for the students) on all the hosts in the inventory.
+The goal is simply to save time when setting up / resetting pi's in a classroom environment.

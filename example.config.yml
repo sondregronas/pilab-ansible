@@ -1,11 +1,20 @@
 ---
 config_dir: '~'
 
+# Default password for student users
+userpass: '123456'
+
 # Enable ping
 ping_enable: true
 
 # Change user password
 changepwd_enable: true
+
+# Change Hostname of pi
+changehostname_enable: true
+
+# Create student users based off of hostname
+createusers_enable: true
 
 # Upgrade from buster to bullseye
 bullseye_enable: true

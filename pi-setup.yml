@@ -29,6 +29,21 @@
         password: "{{ password_pi }}"
       when: changepwd_enable
 
+    - name: Change hostname
+      ansible.builtin.hostname:
+        name: "{{piname}}"
+      when: changehostname_enable
+
+    - name: Create student users
+      user:
+        name: "{{item}}"
+        state: present
+        createhome: yes
+        password: "{{userpass | password_hash('sha512')}}"
+        group: sudo
+      loop: "{{piname.split('-')}}"
+      when: createusers_enable
+
     - name: Upgrade from buster to bullseye
       ansible.builtin.shell: |
         sed -i 's/buster/bullseye/g' /etc/apt/sources.list
