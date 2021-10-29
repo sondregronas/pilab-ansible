@@ -17,6 +17,8 @@ Tested on Raspberry Pi 4 (2GB) running a clean install of Raspberry Pi OS (32-bi
 - Performs a reboot
 
 ### Steps to setup
+ - `cp example.config.yml config.yml` to create the config file, adjust to your liking
+ - `cp example.inventory.ini inventory.ini` to create the hosts file, adjust to your liking
  - Enable SSH on all pis
  - Login as root on admin pi
  - `ssh-copy-id pi@host`
