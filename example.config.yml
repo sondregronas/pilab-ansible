@@ -1,0 +1,29 @@
+---
+config_dir: '~'
+
+# Enable ping
+ping_enable: true
+
+# Change user password
+changepwd_enable: true
+
+# Upgrade from buster to bullseye
+bullseye_enable: true
+
+# Disable autologin
+disableautologin_enable: true
+
+# Update apt
+aptupdate_enable: true
+
+# Install gcc-8
+gcc8_enable: true
+
+# Upgrade apt
+aptupgrade_enable: true
+
+# Packages
+packages_enable: true
+
+# Reboot
+reboot_enable: true
