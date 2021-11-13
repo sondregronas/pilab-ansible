@@ -1,11 +1,19 @@
 ---
 config_dir: '~'
 
+##
+#  setup.yml
+##
+
+# Escalate SSH keys to root in lab_pi's
+setuproot_enable: true
+
+##
+#  pi-setup.yml
+##
+
 # Default password for student users
 userpass: '123456'
-
-# Enable ping
-ping_enable: true
 
 # Change user password
 changepwd_enable: true
@@ -16,22 +24,13 @@ changehostname_enable: true
 # Create student users based off of hostname
 createusers_enable: true
 
-# Upgrade from buster to bullseye
-bullseye_enable: true
-
 # Disable autologin
 disableautologin_enable: true
 
-# Update apt
-aptupdate_enable: true
+# Update apt & upgrade packages
+update_enable: true
 
-# Install gcc-8
-gcc8_enable: true
-
-# Upgrade apt
-aptupgrade_enable: true
-
-# Packages
+# Install recommended packages
 packages_enable: true
 
 # Reboot
