@@ -1,0 +1,91 @@
+---
+- hosts: lab_pi
+  become: yes
+
+  pre_tasks:
+    - name: Load configuration
+      ansible.builtin.include_vars: "{{ item }}"
+      loop:
+        - example.config.yml
+        - config.yml 
+
+  vars_prompt:
+    - name: password_pi
+      prompt: Enter password
+      private: yes
+      encrypt: sha512_crypt
+      confirm: yes
+      salt_size: 7
+
+  tasks:
+    - name: Change user password
+      user:
+        name: pi
+        update_password: always
+        password: "{{ password_pi }}"
+      when: changepwd_enable
+
+    - name: Change hostname
+      ansible.builtin.hostname:
+        name: "{{piname}}"
+      when: changehostname_enable
+
+    - name: Create student users
+      user:
+        name: "{{item}}"
+        state: present
+        createhome: yes
+        password: "{{userpass | password_hash('sha512')}}"
+        group: sudo
+      loop: "{{piname.split('-')}}"
+      when: createusers_enable
+
+    - name: Disable Autologin
+      ansible.builtin.shell: |
+        sed -i 's/^greeter-hide-users=true/greeter-hide-users=false/g' /etc/lightdm/lightdm.conf
+        sed -i 's/^\#greeter-allow-guest=true/greeter-allow-guest=false/g' /etc/lightdm/lightdm.conf
+        sed -i 's/^\#greeter-show-manual-login=false/greeter-show-manual-login=true/g' /etc/lightdm/lightdm.conf
+        sed -i 's/^\#allow-guest=true/allow-guest=false/g' /etc/lightdm/lightdm.conf
+        sed -i 's/^\#allow-guest=true/allow-guest=false/g' /etc/lightdm/lightdm.conf
+        sed -i 's/^\#autologin-user-timeout=0/autologin-user-timeout=10/g' /etc/lightdm/lightdm.conf
+        sed -i 's/^autologin-user=pi/\#autologin-user=pi/g' /etc/lightdm/lightdm.conf
+      when: disableautologin_enable
+
+      # If pi's run on buster, update to bullseye (I'm sure this is temporary)
+    - name: Upgrade from buster to bullseye
+      ansible.builtin.shell: |
+        sed -i 's/buster/bullseye/g' /etc/apt/sources.list
+        sed -i 's/buster/bullseye/g' /etc/apt/sources.list.d/raspi.list
+      when: ansible_distribution_release == 'buster'
+
+    - name: Update apt
+      apt:
+        update_cache: yes
+      when: update_enable
+
+      # If pi's were on buster, install gcc-8-base to transition (This also is just temporary, and a bit hacky)
+    - name: Install gcc-8-base
+      apt:
+        state: latest
+        pkg:
+        - gcc-8-base
+      when: ansible_distribution_release == 'buster'
+
+    - name: Upgrade apt
+      apt: 
+        upgrade: full
+      when: update_enable
+
+    - name: Install some packages
+      apt:
+        install_recommends: yes
+        pkg:
+        - php-mysql
+        - php
+        - mariadb-server
+        - cockpit
+      when: packages_enable
+
+    - name: Reboot
+      reboot:
+      when: reboot_enable

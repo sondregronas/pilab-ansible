@@ -1,0 +1,46 @@
+---
+- hosts: localhost
+  connection: local
+
+  pre_tasks:
+    - name: Load configuration
+      ansible.builtin.include_vars: "{{ item }}"
+      loop:
+        - example.config.yml
+        - config.yml 
+
+  vars_prompt:
+    - name: target_user
+      prompt: Target SSH User
+      default: pi
+      private: no
+    - name: password_pi
+      prompt: Default SSH Password
+      default: raspberry
+      private: yes
+      encrypt: sha512_crypt
+      confirm: yes
+      salt_size: 7
+
+  tasks:
+    - name: Gather package facts
+      package_facts:
+        manager: apt
+
+    - name: sshpass install
+      apt:
+        state: latest
+        pkg: 
+        - sshpass
+      when: '"sshpass" not in ansible_facts.packages'          
+
+    - name: shell
+      ansible.builtin.shell: |
+        sshpass -p {{password_pi}} ssh-copy-id -o StrictHostKeyChecking=no {{target_user}}@{{item}}
+      with_items: "{{groups['lab_pi']}}"
+
+    - name: escalate ssh to root
+      ansible.builtin.shell: |
+        ansible -m shell -a 'sudo mkdir /root/.ssh' -u {{target_user}} lab_pi
+        ansible -m shell -a 'sudo cp .ssh/authorized_keys /root/.ssh/authorized_keys' -u {{target_user}} lab_pi
+      when: setuproot_enable
